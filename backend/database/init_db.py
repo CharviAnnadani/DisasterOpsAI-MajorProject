@@ -1,16 +1,19 @@
-from db import get_connection
+import sqlite3
 
-conn = get_connection()
+conn = sqlite3.connect("disasterops.db")
+
 cursor = conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS sos_requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    latitude REAL,
-    longitude REAL,
-    disaster_type TEXT,
+    phone TEXT NOT NULL,
+    location TEXT NOT NULL,
+    disaster_type TEXT NOT NULL,
+    description TEXT NOT NULL,
     priority INTEGER,
+    assigned_team TEXT,
     status TEXT
 )
 """)
@@ -18,4 +21,4 @@ CREATE TABLE IF NOT EXISTS sos_requests (
 conn.commit()
 conn.close()
 
-print("Database initialized successfully!")
+print("Database Initialized Successfully")

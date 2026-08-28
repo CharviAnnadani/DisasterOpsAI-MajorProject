@@ -4,10 +4,14 @@ from models.sos_model import (
     create_sos,
     get_all_sos,
     update_sos_status,
-    delete_sos
+    delete_sos,
+    get_dashboard_stats
 )
 
-from services.priority_service import calculate_priority
+from services.priority_service import (
+    calculate_priority,
+    assign_rescue_team
+)
 
 sos_bp = Blueprint("sos", __name__)
 
@@ -18,32 +22,48 @@ def create_sos_request():
     data = request.get_json()
 
     name = data["name"]
-    latitude = data["latitude"]
-    longitude = data["longitude"]
+    phone = data["phone"]
+    location = data["location"]
     disaster_type = data["disaster_type"]
+    description = data["description"]
 
-    priority = calculate_priority(disaster_type)
+    priority = calculate_priority(
+        disaster_type,
+        description
+    )
+
+    assigned_team = assign_rescue_team(
+        disaster_type
+    )
 
     create_sos(
         name,
-        latitude,
-        longitude,
+        phone,
+        location,
         disaster_type,
+        description,
         priority,
-        "Pending"
+        assigned_team,
+        "Team Assigned"
     )
 
     return jsonify({
-        "message": "SOS Request Created Successfully"
+        "message": "SOS Request Created Successfully",
+        "priority": priority,
+        "assigned_team": assigned_team
     })
 
 
 @sos_bp.route("/sos", methods=["GET"])
 def fetch_sos():
 
-    data = get_all_sos()
+    return jsonify(get_all_sos())
 
-    return jsonify(data)
+
+@sos_bp.route("/dashboard", methods=["GET"])
+def dashboard():
+
+    return jsonify(get_dashboard_stats())
 
 
 @sos_bp.route("/sos/<int:sos_id>", methods=["PUT"])
