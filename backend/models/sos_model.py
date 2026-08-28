@@ -13,6 +13,7 @@ def create_sos(name, latitude, longitude, disaster_type, priority, status):
     conn.commit()
     conn.close()
 
+
 def get_all_sos():
     conn = get_connection()
     cursor = conn.cursor()
@@ -26,3 +27,30 @@ def get_all_sos():
     conn.close()
 
     return data
+
+
+def update_sos_status(sos_id, status):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE sos_requests
+        SET status = ?
+        WHERE id = ?
+    """, (status, sos_id))
+
+    conn.commit()
+    conn.close()
+
+
+def delete_sos(sos_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM sos_requests
+        WHERE id = ?
+    """, (sos_id,))
+
+    conn.commit()
+    conn.close()
